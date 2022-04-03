@@ -12,14 +12,13 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { theme } from "./colors";
 import { AntDesign, Fontisto } from "@expo/vector-icons";
-import Position from "react-native/Libraries/Components/Touchable/Position";
-import { backgroundColor } from "react-native/Libraries/Components/View/ReactNativeStyleAttributes";
 
 export default function App() {
   const [working, setWorking] = useState();
   const [text, setText] = useState("");
   const [todos, setTodos] = useState({});
-  let editing;
+  const [editing, setEditing] = useState(false);
+  const [currentTodo, setCurrentTodo] = useState({});
 
   useEffect(() => {
     getTodos();
@@ -104,9 +103,25 @@ export default function App() {
     saveTodos(newTodos);
     console.log(newTodos[key]);
   };
-  const editTodo = () => {
-    editing = true;
+
+  const editClick = (key) => {
+    const newTodos = { ...todos };
+    console.log("New", newTodos);
+    setCurrentTodo(newTodos[key]);
+    setEditing(true);
+    console.log("Edit: ", newTodos[key]);
   };
+  const editTodo = (event) => {
+    setCurrentTodo({ ...currentTodo, text: event.target.value });
+    const newTodos = {
+      ...todos,
+      currentTodo,
+    };
+    setTodos(newTodos);
+    saveTodos(newTodos);
+    setEditing(false);
+  };
+
   const clearAll = () => {
     Alert.alert("Clear All ,", "ARE YOU SURE?", [
       { text: "Cancel" },
@@ -120,6 +135,8 @@ export default function App() {
       },
     ]);
   };
+  console.log("from Here");
+  console.log(todos);
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
@@ -149,35 +166,44 @@ export default function App() {
           </Text>
         </TouchableOpacity>
       </View>
-      <TextInput
-        onChangeText={onChangeText}
-        onSubmitEditing={addTodo}
-        value={text}
-        placeholder={
-          working ? "What do you want to do?" : "What do you want to study?"
-        }
-        style={styles.input}
-      />
+
+      {/* text input */}
+      {editing ? (
+        <TextInput
+          onSubmitEditing={editTodo}
+          value={currentTodo.text}
+          placeholder="Edit todo"
+          style={styles.input}
+        />
+      ) : (
+        <TextInput
+          onChangeText={onChangeText}
+          onSubmitEditing={addTodo}
+          value={text}
+          placeholder={
+            working ? "What do you want to do?" : "What do you want to study?"
+          }
+          style={styles.input}
+        />
+      )}
+
+      {/* Todo list */}
       <ScrollView>
         {Object.keys(todos).map((key) =>
           todos[key].working === working ? (
             <View style={styles.todo} key={key}>
-              {editing ? (
-                <TextInput value={todos[key].text} />
-              ) : (
-                <Text
-                  style={{
-                    ...styles.todoText,
-                    textDecorationLine: todos[key].completed
-                      ? "line-through"
-                      : "none",
-                    color: todos[key].completed ? theme.light : "white",
-                  }}
-                >
-                  {todos[key].text}
-                </Text>
-              )}
-              <TouchableOpacity onPress={() => editTodo(key)}>
+              <Text
+                style={{
+                  ...styles.todoText,
+                  textDecorationLine: todos[key].completed
+                    ? "line-through"
+                    : "none",
+                  color: todos[key].completed ? theme.light : "white",
+                }}
+              >
+                {todos[key].text}
+              </Text>
+              <TouchableOpacity onPress={() => editClick(key)}>
                 <AntDesign name="edit" size={20} color={theme.light} />
               </TouchableOpacity>
 
@@ -199,6 +225,7 @@ export default function App() {
           ) : null
         )}
       </ScrollView>
+
       <View style={styles.footer}>
         <TouchableOpacity onPress={() => clearAll()} style={styles.clearAll}>
           <Text>Clear</Text>
