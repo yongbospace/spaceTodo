@@ -19,7 +19,7 @@ export default function App() {
   const [todos, setTodos] = useState({});
   const [editing, setEditing] = useState(false);
   const [currentTodo, setCurrentTodo] = useState({});
-
+  let todoKey = "";
   useEffect(() => {
     getTodos();
     getWorking();
@@ -115,25 +115,18 @@ export default function App() {
   };
 
   // Edit Todo fixing ㅠㅠ Help Me!!!
-  const editClick = (key) => {
-    setEditing(true);
-    setCurrentTodo({ ...todos[key] });
-    console.log("editing", currentTodo);
-  };
 
-  const editTodo = (key) => {
-    const newTodo = () => {
-      currentTodo.text;
-    };
-    setCurrentTodo(newTodo);
-    const newTodos = {
-      ...todos,
-      currentTodo,
-    };
-    setEditing(false);
-    setTodos(newTodos);
-    saveTodos(newTodos);
-  };
+  // const editClick = (key) => {
+  //   setCurrentTodo({ ...todos[key] });
+  //   setEditing(true);
+  // };
+  // const editTodo = (event) => {
+  //   const newTodos = [...todos];
+  //   console.log(event.target.text);
+  //   setEditing(false);
+  //   // setTodos(newTodos);
+  //   // saveTodos(newTodos);
+  // };
 
   // remove Every Todos
   const clearAll = () => {
@@ -149,8 +142,6 @@ export default function App() {
       },
     ]);
   };
-  console.log("from Here");
-  console.log(todos);
 
   return (
     // Header
@@ -187,7 +178,7 @@ export default function App() {
       {editing ? (
         <TextInput
           onChangeText={onChangeText}
-          onSubmitEditing={editTodo}
+          onSubmitEditing={(event) => editTodo(event)}
           defaultValue={currentTodo.text}
           value={text}
           placeholder="Edit todo"
@@ -221,9 +212,9 @@ export default function App() {
               >
                 {todos[key].text}
               </Text>
-              <TouchableOpacity onPress={() => editClick(key)}>
+              {/* <TouchableOpacity onPress={() => editClick(key)}>
                 <AntDesign name="edit" size={20} color={theme.light} />
-              </TouchableOpacity>
+              </TouchableOpacity> */}
 
               <TouchableOpacity onPress={() => completeTodo(key)}>
                 {todos[key].completed ? (
@@ -283,10 +274,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   todoText: {
-    width: "70%",
     color: "white",
     fontSize: 18,
     fontWeight: "600",
+    width: "80%",
   },
   footer: {
     justifyContent: "center",
