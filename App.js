@@ -38,6 +38,8 @@ export default function App() {
   const onChangeText = (payload) => {
     setText(payload);
   };
+
+  // Remember which tap was used lasttime
   const saveWorking = async (workingValue) => {
     try {
       await AsyncStorage.setItem("@working", workingValue.toString());
@@ -53,6 +55,8 @@ export default function App() {
       console.log("error from getWorking", e);
     }
   };
+
+  // Save & Load from Storage
   const saveTodos = async (toSave) => {
     try {
       const json = JSON.stringify(toSave);
@@ -69,6 +73,8 @@ export default function App() {
       console.log("error from getTodos", e);
     }
   };
+
+  // Add new Todos
   const addTodo = () => {
     if (text === "") {
       return;
@@ -81,6 +87,8 @@ export default function App() {
     saveTodos(newTodos);
     setText("");
   };
+
+  // Delete each Todo
   const deleteTodo = (key) => {
     Alert.alert("Delete Todo ,", "ARE YOU SURE?", [
       { text: "Cancel" },
@@ -96,6 +104,8 @@ export default function App() {
       },
     ]);
   };
+
+  // Complete Todo
   const completeTodo = (key) => {
     const newTodos = { ...todos };
     newTodos[key] = { ...newTodos[key], completed: !newTodos[key].completed };
@@ -104,24 +114,28 @@ export default function App() {
     console.log(newTodos[key]);
   };
 
+  // Edit Todo fixing ㅠㅠ Help Me!!!
   const editClick = (key) => {
-    const newTodos = { ...todos };
-    console.log("New", newTodos);
-    setCurrentTodo(newTodos[key]);
     setEditing(true);
-    console.log("Edit: ", newTodos[key]);
+    setCurrentTodo({ ...todos[key] });
+    console.log("editing", currentTodo);
   };
-  const editTodo = (event) => {
-    setCurrentTodo({ ...currentTodo, text: event.target.value });
+
+  const editTodo = (key) => {
+    const newTodo = () => {
+      currentTodo.text;
+    };
+    setCurrentTodo(newTodo);
     const newTodos = {
       ...todos,
       currentTodo,
     };
+    setEditing(false);
     setTodos(newTodos);
     saveTodos(newTodos);
-    setEditing(false);
   };
 
+  // remove Every Todos
   const clearAll = () => {
     Alert.alert("Clear All ,", "ARE YOU SURE?", [
       { text: "Cancel" },
@@ -137,7 +151,9 @@ export default function App() {
   };
   console.log("from Here");
   console.log(todos);
+
   return (
+    // Header
     <View style={styles.container}>
       <StatusBar style="light" />
       <View style={styles.header}>
@@ -167,11 +183,13 @@ export default function App() {
         </TouchableOpacity>
       </View>
 
-      {/* text input */}
+      {/* text input new Todo & edit Todo*/}
       {editing ? (
         <TextInput
+          onChangeText={onChangeText}
           onSubmitEditing={editTodo}
-          value={currentTodo.text}
+          defaultValue={currentTodo.text}
+          value={text}
           placeholder="Edit todo"
           style={styles.input}
         />
